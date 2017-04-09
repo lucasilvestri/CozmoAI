@@ -7,15 +7,16 @@ from cozmo.util import degrees, distance_mm, speed_mmps, Pose
 
 import time, random, sys
 
-from uselessMachine import useless
+from uselessMachine import useless, tap_handler
 
 try:
     from PIL import ImageDraw, ImageFont
 except ImportError:
     sys.exit('run `pip3 install --user Pillow numpy` to run this example')
 
+interaction = 0
 
-id_cube = 0
+
 # Define an annotator using the annotator decorator
 @cozmo.annotate.annotator
 def clock(image, scale, annotator=None, world=None, **kw):
@@ -39,98 +40,9 @@ class Battery(cozmo.annotate.Annotator):
             text = cozmo.annotate.ImageText('BATT %.1fv' % batt, color='orange')
         text.render(d, bounds)
 
-def tap_handler(evt, obj=None, tap_count=None, **kwargs):
-    cube_tapped = evt.obj
-    cube_tapped.set_lights(cozmo.lights.Light(on_color=cozmo.lights.Color(
-        rgb=(round(random.random() * 255), round(random.random() * 100), round(random.random() * 255)))))
-    # print(cube, tap_count)
-    print("Tapped: ", cube_tapped.object_id)
-    global id_cube
-    id_cube = cube_tapped.object_id
-
-def faceAppeared(evt, face=None, **kwargs):
-    print("face appeared", face.name)
-
-def actionCompleted(evt, **kwargs):
-    print("actionCompleted")
-
-def actionStarted(evt, **kwargs):
-    print("actionStarted")
-
-def animationCompleted(evt, **kwargs):
-    print("animationCompleted")
-
-def animationsLoaded(evt, **kwargs):
-    print("animationsLoaded")
-
-def behaviorStarted(evt, behavior_type_name=None, **kwargs):
-    print("behaviorStarted", behavior_type_name)
-
-def behaviorStopped(evt, **kwargs):
-    print("behaviorStopped")
-
-def newRawCameraImage(evt, **kwargs):
-    print("newRawCameraImage")
-
-def robotFound(evt, **kwargs):
-    print("robotFound")
-
-def erasedEnrolledFace(evt, **kwargs):
-    print("erasedEnrolledFace")
-
-def faceDisappeared(evt, **kwargs):
-    print("faceDisappeared")
-
-def faceIdChanged(evt, **kwargs):
-    print("faceIdChanged")
-
-def faceObserved(evt, **kwargs):
-    None
-    #print("faceObserved")
-
-def faceRenamed(evt, **kwargs):
-    print("faceRenamed")
-
-def objectAppeared(evt, **kwargs):
-    print("objectAppeared")
-
-def objectAvailable(evt, obj=None, **kwargs):
-    print("objectAvailable")
-
-def connectChanged(evt, **kwargs):
-    print("connectChanged")
-
-def objectDisappeared(evt, **kwargs):
-    print("objectDisappeared")
-
-def objectMoving(evt, **kwargs):
-    print("objectMoving")
-
-def movingStarted(evt, **kwargs):
-    print("movingStarted")
-
-def movingStopped(evt, **kwargs):
-    print("movingStopped")
-
-def objectObserved(evt, **kwargs):
-    None
-    #SPAM print("objectObserved")
-
-def petAppeared(evt, **kwargs):
-    print("petAppeared")
-
-def petDisappeared(evt, **kwargs):
-    print("petDisappeared")
-
-def petObserved(evt, **kwargs):
-    print("petObserved")
-
-def robotReady(evt, **kwargs):
-    print("robotReady")
-
-def newCameraImage(evt, **kwargs):
-    print("newCameraImage")
-
+def objectTapped(evt, obj=None, tap_count=None, **kwargs):
+    if interaction == 1:
+        tap_handler(evt, obj=None, **kwargs)
 
 def cozmo_program(robot: cozmo.robot.Robot):
     robot.world.image_annotator.add_static_text('text', 'Coz-Cam', position=cozmo.annotate.TOP_RIGHT)
@@ -141,35 +53,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
     print(robot.world.robot.battery_voltage)
     print("--------------------------")
 
-    robot.world.add_event_handler(cozmo.objects.EvtObjectTapped, tap_handler)
-    robot.world.add_event_handler(cozmo.faces.EvtFaceAppeared, faceAppeared)
-    robot.world.add_event_handler(cozmo.action.EvtActionCompleted, actionCompleted)
-    robot.world.add_event_handler(cozmo.action.EvtActionStarted, actionStarted)
-    robot.world.add_event_handler(cozmo.anim.EvtAnimationCompleted, animationCompleted)
-    robot.world.add_event_handler(cozmo.anim.EvtAnimationsLoaded, animationsLoaded)
-    robot.world.add_event_handler(cozmo.behavior.EvtBehaviorStarted, behaviorStarted)
-    robot.world.add_event_handler(cozmo.behavior.EvtBehaviorStopped, behaviorStopped)
-    #SPAM robot.world.add_event_handler(cozmo.camera.EvtNewRawCameraImage, newRawCameraImage)
-    robot.world.add_event_handler(cozmo.conn.EvtRobotFound, robotFound)
-    robot.world.add_event_handler(cozmo.faces.EvtErasedEnrolledFace, erasedEnrolledFace)
-    robot.world.add_event_handler(cozmo.faces.EvtFaceDisappeared, faceDisappeared)
-    robot.world.add_event_handler(cozmo.faces.EvtFaceIdChanged, faceIdChanged)
-    robot.world.add_event_handler(cozmo.faces.EvtFaceObserved, faceObserved)
-    robot.world.add_event_handler(cozmo.faces.EvtFaceRenamed, faceRenamed)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectAppeared, objectAppeared)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectAvailable, objectAvailable)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectConnectChanged, connectChanged)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectDisappeared, objectDisappeared)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectMoving, objectMoving)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectMovingStarted, movingStarted)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectMovingStopped, movingStopped)
-    robot.world.add_event_handler(cozmo.objects.EvtObjectObserved, objectObserved)
-    robot.world.add_event_handler(cozmo.pets.EvtPetAppeared, petAppeared)
-    robot.world.add_event_handler(cozmo.pets.EvtPetDisappeared, petDisappeared)
-    robot.world.add_event_handler(cozmo.pets.EvtPetObserved, petObserved)
-    robot.world.add_event_handler(cozmo.robot.EvtRobotReady, robotReady)
-    #SPAM robot.world.add_event_handler(cozmo.world.EvtNewCameraImage, newCameraImage)
-
+    robot.world.add_event_handler(cozmo.objects.EvtObjectTapped, objectTapped)
     #robot.say_text("A I loading...", use_cozmo_voice=False).wait_for_completed()
     #Initialization
     if robot.is_on_charger:
@@ -177,12 +61,16 @@ def cozmo_program(robot: cozmo.robot.Robot):
         robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
 
     robot.start_freeplay_behaviors()
+
     while True:
         time.sleep(1)
         #Run mini games
-        run = random.randint(0,100)
+        run = random.randint(0,10)
+        global interaction
         if run  == 1:
+            interaction = 1
             useless(robot)
+        interaction = 0
 
 
 

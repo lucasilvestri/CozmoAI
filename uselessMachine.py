@@ -2,6 +2,17 @@ import cozmo
 from cozmo.util import distance_mm, speed_mmps
 import random, time
 
+id_cube = 0
+
+def tap_handler(evt, obj=None, tap_count=None, **kwargs):
+    cube_tapped = evt.obj
+    cube_tapped.set_lights(cozmo.lights.Light(on_color=cozmo.lights.Color(
+        rgb=(round(random.random() * 255), round(random.random() * 100), round(random.random() * 255)))))
+    # print(cube, tap_count)
+    print("Tapped: ", cube_tapped.object_id)
+    global id_cube
+    id_cube = cube_tapped.object_id
+
 def useless(robot):
     robot.stop_freeplay_behaviors()
     print("StartMiniGame X")
