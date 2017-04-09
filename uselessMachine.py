@@ -35,9 +35,13 @@ def useless(robot):
     global id_cube
     while True:
         time.sleep(1)
+        try:
+            if cozmo.objects.LightCube.last_tapped_time:
+                print(cozmo.objects.LightCube.last_tapped_time)
+        except: TimeoutError
         if id_cube:
             robot.play_anim_trigger(cozmo.anim.Triggers.CubePounceLoseSession).wait_for_completed()
-            print("vado verso il cubo", id_cube)
+            print("Going to cube", id_cube)
             for mycube in cube_vision:
                 if mycube.object_id == id_cube:
                     robot.go_to_object(mycube, distance_mm(60)).wait_for_completed()
