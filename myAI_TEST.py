@@ -26,12 +26,13 @@ def clock(image, scale, annotator=None, world=None, **kw):
             position=cozmo.annotate.TOP_LEFT)
     text.render(d, bounds)
 
+
 # Define another decorator as a subclass of Annotator
 class Battery(cozmo.annotate.Annotator):
     def apply(self, image, scale):
         d = ImageDraw.Draw(image)
         bounds = (0, 0, image.width, image.height)
-        batt = self.world.robot.battery_voltage #3.3-3.6 3.7-3.9 4.0-4.2
+        batt = self.world.robot.battery_voltage  # 3.3-3.6 3.7-3.9 4.0-4.2
         if batt >= 4.0:
             text = cozmo.annotate.ImageText('BATT %.1fv' % batt, color='green')
         elif batt <= 3.6:
@@ -40,9 +41,11 @@ class Battery(cozmo.annotate.Annotator):
             text = cozmo.annotate.ImageText('BATT %.1fv' % batt, color='orange')
         text.render(d, bounds)
 
-def objectTapped(evt, obj=None, tap_count=None, **kwargs):
+
+def object_tapped(evt, obj=None, tap_count=None, **kwargs):
     if interaction == 1:
         tap_handler(evt, obj=None, **kwargs)
+
 
 def cozmo_program(robot: cozmo.robot.Robot):
     robot.world.image_annotator.add_static_text('text', 'Coz-Cam', position=cozmo.annotate.TOP_RIGHT)
@@ -53,9 +56,8 @@ def cozmo_program(robot: cozmo.robot.Robot):
     print(robot.world.robot.battery_voltage)
     print("--------------------------")
 
-    robot.world.add_event_handler(cozmo.objects.EvtObjectTapped, objectTapped)
-    #robot.say_text("A I loading...", use_cozmo_voice=False).wait_for_completed()
-    #Initialization
+    robot.world.add_event_handler(cozmo.objects.EvtObjectTapped, object_tapped)
+    # Initialization
     if robot.is_on_charger:
         robot.drive_off_charger_contacts().wait_for_completed()
         robot.drive_straight(distance_mm(100), speed_mmps(50)).wait_for_completed()
@@ -64,15 +66,13 @@ def cozmo_program(robot: cozmo.robot.Robot):
 
     while True:
         time.sleep(1)
-        #Run mini games
-        run = random.randint(0,10)
+        # Run mini games
+        run = random.randint(0,100)
         global interaction
-        if run  == 1:
+        if run == 1:
             interaction = 1
             useless(robot)
         interaction = 0
-
-
 
 
 cozmo.robot.Robot.drive_off_charger_on_connect = False
